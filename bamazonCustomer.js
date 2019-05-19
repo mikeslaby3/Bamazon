@@ -11,14 +11,21 @@ let connection = mysql.createConnection({
 
 connection.connect(function(err) {
     if (err) throw err;
-    console.log('connected as id ' + connection.threadId);
-    afterConnection();
+    start();
 });
 
-function afterConnection() {
-    connection.query("SELECT * FROM products", function(err, res) {
+function start() {
+    connection.query("SELECT item_id, product_name, price FROM products", function(err, res) {
       if (err) throw err;
-      console.log(res);
-      connection.end();
+      
+      for (let i = 0; i < res.length; i++) {
+          console.log('Item ID: ' + res[i].item_id);
+          console.log('Product: ' + res[i].product_name);
+          console.log('Price: $' + res[i].price);
+          console.log('\n');
+      }
+
+    //   connection.end();
     });
-  }
+}
+

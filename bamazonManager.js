@@ -101,7 +101,7 @@ function addToInventory() {
         inquirer
             .prompt([
                 {
-                    name: 'choice',
+                    name: 'product_name',
                     type: 'rawlist',
                     choices: function () {
                         let productArray = [];
@@ -119,19 +119,29 @@ function addToInventory() {
                 }
             ])
             .then(function (answer) {
-                let updatedQuantity = res[0].stock_quantity + answer.stock_quantity;
+
+                let chosenItem;
+                for (let i = 0; i < res.length; i++) {
+                    if (res[i].product_name === answer.product_name) {
+                        chosenItem = res[i];
+                    }
+                }
+
+                let updatedQuantity = chosenItem.stock_quantity + parseInt(answer.stock_quantity);
+                console.log(updatedQuantity);
+                
                 connection.query(
                     'UPDATE products SET ? WHERE ?',
                     [
                         { stock_quantity: updatedQuantity },
-                        { item_id: answer.item_id }
+                        { product_name: answer.product_name }
                     ],
                     function (err) {
                         if (err) {
                             console.log('Inventory update failed');
                             throw err;
                         } else {
-                            console.log(answer.stock_quantity + ' item(s) added to the ' + res[0].product_name + ' inventory');
+                            console.log(answer.stock_quantity + ' item(s) added to the ' + answer.product_name + ' inventory');
                             connection.end();
                         }
                     }

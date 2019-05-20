@@ -59,7 +59,9 @@ function viewProductsForSale() {
             for (let i = 0; i < res.length; i++) {
                 console.log('Item ID: ' + res[i].item_id);
                 console.log('Product: ' + res[i].product_name);
+                console.log('Department: ' + res[i].department_name);
                 console.log('Price: $' + res[i].price);
+                console.log('Quantity in Stock: ' + res[i].stock_quantity);
                 console.log('\n');
             }
         }
@@ -80,7 +82,11 @@ function viewLowInventory() {
             for (let i = 0; i < res.length; i++) {
                 console.log('Item ID: ' + res[i].item_id);
                 console.log('Product: ' + res[i].product_name);
-                console.log('Price: $' + res[i].price);
+                if (res[i].stock_quantity <= 0) {
+                    console.log('OUT OF STOCK')
+                } else {
+                    console.log('Quantity in Stock: ' + res[i].stock_quantity);
+                }
                 console.log('\n');
             }
         }
@@ -89,7 +95,49 @@ function viewLowInventory() {
 }
 
 function addToInventory() {
-
+    inquirer
+        .prompt([
+            {
+                name: 'product_name',
+                type: 'input',
+                message: 'What\'s the name of the product you\'d like to add?'
+            },
+            {
+                name: 'department_name',
+                type: 'input',
+                message: 'What department does this product belong to?'
+            },
+            {
+                name: 'price',
+                type: 'input',
+                message: 'How much does this product cost?'
+            },
+            {
+                name: 'stock_quantity',
+                type: 'input',
+                message: 'How many items are in stock?'
+            }
+        ])
+        .then(function (answer) {
+            connection.query(
+                "INSERT INTO products SET ?",
+                {
+                    product_name: answer.product_name,
+                    department_name: answer.department_name,
+                    price: answer.price,
+                    stock_quantity: answer.stock_quantity
+                },
+                function (err) {
+                    if (err) {
+                        console.log('Unsuccessful new item');
+                        throw error;
+                    } else {
+                        console.log('Item successfully added to store!');
+                        connection.end();
+                    }
+                }
+            );
+        });
 }
 
 function addNewProduct() {
@@ -116,7 +164,7 @@ function addNewProduct() {
                 message: 'How many items are in stock?'
             }
         ])
-        .then(function(answer) {
+        .then(function (answer) {
             connection.query(
                 "INSERT INTO products SET ?",
                 {
@@ -125,7 +173,7 @@ function addNewProduct() {
                     price: answer.price,
                     stock_quantity: answer.stock_quantity
                 },
-                function(err) {
+                function (err) {
                     if (err) {
                         console.log('Unsuccessful new item');
                         throw error;

@@ -32,16 +32,22 @@ function afterConnection() {
         ])
         .then(function (answer) {
             let choice = answer.manager_options
-            if (choice === "View Products for Sale") {
-                viewProductsForSale();
-            } else if (choice === "View Low Inventory") {
-                viewLowInventory();
-            } else if (choice === "Add to Inventory") {
-                addToInventory();
-            } else if (choice === "Add New Product") {
-                addNewProduct();
-            } else if (choice === 'Exit') {
-                connection.end();
+            switch(choice) {
+                case "View Products for Sale":
+                    viewProductsForSale();
+                    break;
+                case "View Low Inventory":
+                    viewLowInventory();
+                    break;
+                case "Add to Inventory":
+                    addToInventory();
+                    break;
+                case "Add New Product":
+                    addNewProduct();
+                    break;
+                case "Exit":
+                    connection.end();
+                    break;
             }
         });
 }
@@ -151,7 +157,7 @@ function addToInventory() {
                     );
                 }
             });
-    })
+    });
 }
 
 function addNewProduct() {

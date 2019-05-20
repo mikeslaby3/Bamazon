@@ -43,6 +43,7 @@ function getItem() {
             }
         ])
         .then(function (answer) {
+            // If the user presses enter without typing anything, the connection ends
             if (answer.item_id === '') {
                 connection.end();
             } else {
@@ -57,6 +58,7 @@ function getItem() {
                                 console.log('Item not found');
                                 getItem();
                             } else {
+                                console.log('Ahhh, ' + res[0].product_name + ', nice choice!');
                                 purchaseItem(res);
                             }
                         }
@@ -81,6 +83,9 @@ function purchaseItem(res) {
             } else {
                 if (res[0].stock_quantity >= answer.stock_quantity) {
                     let updatedQuantity = res[0].stock_quantity - answer.stock_quantity;
+                    /* If the stock quantity is greater than or equal to the requested quantity,
+                    update the stock quantity in mySQL to subtract the amount bought
+                    in the object with the same item ID as what the user inputted */
                     connection.query(
                         'UPDATE products SET ? WHERE ?',
                         [
@@ -100,6 +105,7 @@ function purchaseItem(res) {
                 } else {
                     if (res[0].stock_quantity === 0) {
                         console.log('Item out of stock');
+                        getItem();
                     } else {
                         console.log('Only ' + res[0].stock_quantity + ' available');
                         purchaseItem(res);

@@ -30,90 +30,85 @@ function afterConnection() {
         }
 
         getItem();
-        //   connection.end();
     });
 }
 
 function getItem() {
     inquirer
-    .prompt([
-        {
-          name: "item_id",
-          type: "input",
-          message: "What's the item ID of the product you'd like to purchase?"
-        }
-    ])
-    .then(function(answer) {
-        connection.query(
-            'SELECT * FROM products WHERE item_id =' + answer.item_id, 
-        function (err, res){
-            if (err) {
-                console.log('Item selection failed');
-                throw err;
-            } else {
-                if (res.length === 0) {
-                    console.log('Item not found');
-                    getItem();
-                } else {
-                    purchaseItem();
-                }
+        .prompt([
+            {
+                name: "item_id",
+                type: "input",
+                message: "What's the item ID of the product you'd like to purchase?"
             }
-        }
-        )
-    });
+        ])
+        .then(function (answer) {
+            if (answer.item_id === '') {
+                connection.end();
+            } else {
+                connection.query(
+                    'SELECT * FROM products WHERE item_id =' + answer.item_id,
+                    function (err, res) {
+                        if (err) {
+                            console.log('Item selection failed');
+                            throw err;
+                        } else {
+                            if (res.length === 0) {
+                                console.log('Item not found');
+                                getItem();
+                            } else {
+                                purchaseItem(res);
+                            }
+                        }
+                    }
+                )
+            }
+        });
 }
 
-function purchaseItem() {
+function purchaseItem(res) {
     inquirer
-    .prompt([
-        {
-          name: "item_id",
-          type: "input",
-          message: "What's the item ID of the product you'd like to purchase?"
-        },
-        {
-          name: 'stock_quantity',
-          type: 'input',
-          message: 'How many units of product would you like to buy?'
-        }
-    ])
-    .then(function(answer) {
-        connection.query(
-            'SELECT * FROM products WHERE item_id =' + answer.item_id, 
-        function (err, res){
-            if (err) {
-                console.log('Item selection failed');
-                throw err;
+        .prompt([
+            {
+                name: 'stock_quantity',
+                type: 'input',
+                message: 'How many units of product would you like to buy?'
+            }
+        ])
+        .then(function (answer) {
+            if (answer.stock_quantity === '') {
+                connection.end();
             } else {
-                console.log(res.length);
-                if (res.length === 0) {
-                    console.log('Item not found');
-                } else {
-                    if (res[0].stock_quantity >= answer.stock_quantity) {
-                        let updatedQuantity = res[0].stock_quantity - answer.stock_quantity;
-                        connection.query(
-                          'UPDATE products SET ? WHERE ?', 
-                          [
-                            {stock_quantity: updatedQuantity},
-                            {item_id: answer.item_id}
-                          ],
-                          function(err) {
+                if (res[0].stock_quantity >= answer.stock_quantity) {
+                    let updatedQuantity = res[0].stock_quantity - answer.stock_quantity;
+                    connection.query(
+                        'UPDATE products SET ? WHERE ?',
+                        [
+                            { stock_quantity: updatedQuantity },
+                            { item_id: answer.item_id }
+                        ],
+                        function (err) {
                             if (err) {
                                 console.log('Product update failed');
                                 throw err;
                             } else {
-                                console.log(answer.stock_quantity + ' item(s) purchased')
+                                console.log(answer.stock_quantity + ' item(s) purchased');
+                                connection.end();
                             }
-                          }
-                        );
+                        }
+                    );
+                } else {
+                    if (res[0].stock_quantity === 0) {
+                        console.log('Item out of stock');
                     } else {
-                        console.log('Error: Requested ' + answer.stock_quantity + ' and available = ' + res[0].stock_quantity);
+                        console.log('Only ' + res[0].stock_quantity + ' available');
+                        purchaseItem(res);
                     }
                 }
             }
-            afterConnection();
         }
         )
-    });
 }
+
+
 

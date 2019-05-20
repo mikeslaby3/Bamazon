@@ -119,33 +119,37 @@ function addToInventory() {
                 }
             ])
             .then(function (answer) {
-
-                let chosenItem;
-                for (let i = 0; i < res.length; i++) {
-                    if (res[i].product_name === answer.product_name) {
-                        chosenItem = res[i];
-                    }
-                }
-
-                let updatedQuantity = chosenItem.stock_quantity + parseInt(answer.stock_quantity);
-                console.log(updatedQuantity);
-                
-                connection.query(
-                    'UPDATE products SET ? WHERE ?',
-                    [
-                        { stock_quantity: updatedQuantity },
-                        { product_name: answer.product_name }
-                    ],
-                    function (err) {
-                        if (err) {
-                            console.log('Inventory update failed');
-                            throw err;
-                        } else {
-                            console.log(answer.stock_quantity + ' item(s) added to the ' + answer.product_name + ' inventory');
-                            connection.end();
+                if (isNaN(answer.stock_quantity)) {
+                    console.log('Not a valid number, try again');
+                    addToInventory();
+                } else {
+                    let chosenItem;
+                    for (let i = 0; i < res.length; i++) {
+                        if (res[i].product_name === answer.product_name) {
+                            chosenItem = res[i];
                         }
                     }
-                );
+
+                    let updatedQuantity = chosenItem.stock_quantity + parseInt(answer.stock_quantity);
+                    console.log(updatedQuantity);
+
+                    connection.query(
+                        'UPDATE products SET ? WHERE ?',
+                        [
+                            { stock_quantity: updatedQuantity },
+                            { product_name: answer.product_name }
+                        ],
+                        function (err) {
+                            if (err) {
+                                console.log('Inventory update failed');
+                                throw err;
+                            } else {
+                                console.log(answer.stock_quantity + ' item(s) added to the ' + answer.product_name + ' inventory');
+                                connection.end();
+                            }
+                        }
+                    );
+                }
             });
     })
 }

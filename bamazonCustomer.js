@@ -83,14 +83,12 @@ function purchaseItem(res) {
             } else {
                 if (res[0].stock_quantity >= answer.stock_quantity) {
                     let updatedQuantity = res[0].stock_quantity - answer.stock_quantity;
-                    /* If the stock quantity is greater than or equal to the requested quantity,
-                    update the stock quantity in mySQL to subtract the amount bought
-                    in the object with the same item ID as what the user inputted */
+                    console.log(updatedQuantity);
                     connection.query(
                         'UPDATE products SET ? WHERE ?',
                         [
                             { stock_quantity: updatedQuantity },
-                            { item_id: answer.item_id }
+                            { item_id: res[0].item_id }
                         ],
                         function (err) {
                             if (err) {

@@ -76,7 +76,7 @@ function viewProductsForSale() {
 }
 
 function viewLowInventory() {
-    connection.query("SELECT * FROM products WHERE stock_quantity <= 5", function (err, res) {
+    connection.query("SELECT * FROM products WHERE stock_quantity <= 5 ORDER BY stock_quantity DESC", function (err, res) {
         if (err) {
             console.log('Item list not found');
             throw err

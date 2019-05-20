@@ -1,8 +1,8 @@
 # Bamazon
 
-Bamazon is a node.js app that utilizes mySQL to create an Amazon-like storefront. The app takes in orders from customers and then depletes stock from the store's inventory stored in a mySQL database.
+Bamazon is a node.js app that utilizes mySQL and the node package "Inquirer" to create an Amazon-like storefront. The app takes in orders from customers and then depletes stock from the store's inventory stored in a mySQL database.
 
-When the Bamazon runs, it presents the user with all of the items offered, accompanied by a product ID and price as shown below.
+When Bamazon runs, it presents the user with all of the items offered, accompanied by a product ID and price as shown below.
 
 ![](images/item-inventory.png)
 

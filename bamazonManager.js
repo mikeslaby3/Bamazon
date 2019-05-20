@@ -95,49 +95,49 @@ function viewLowInventory() {
 }
 
 function addToInventory() {
-    inquirer
-        .prompt([
-            {
-                name: 'product_name',
-                type: 'input',
-                message: 'What\'s the name of the product you\'d like to add?'
-            },
-            {
-                name: 'department_name',
-                type: 'input',
-                message: 'What department does this product belong to?'
-            },
-            {
-                name: 'price',
-                type: 'input',
-                message: 'How much does this product cost?'
-            },
-            {
-                name: 'stock_quantity',
-                type: 'input',
-                message: 'How many items are in stock?'
-            }
-        ])
-        .then(function (answer) {
-            connection.query(
-                "INSERT INTO products SET ?",
+    connection.query('SELECT * FROM products', function (err, res) {
+        if (err) throw err;
+
+        inquirer
+            .prompt([
                 {
-                    product_name: answer.product_name,
-                    department_name: answer.department_name,
-                    price: answer.price,
-                    stock_quantity: answer.stock_quantity
+                    name: 'choice',
+                    type: 'rawlist',
+                    choices: function () {
+                        let productArray = [];
+                        for (let i = 0; i < res.length; i++) {
+                            productArray.push(res[i].product_name);
+                        }
+                        return productArray;
+                    },
+                    message: 'Which product would you like increase the inventory of?'
                 },
-                function (err) {
-                    if (err) {
-                        console.log('Unsuccessful new item');
-                        throw error;
-                    } else {
-                        console.log('Item successfully added to store!');
-                        connection.end();
-                    }
+                {
+                    name: 'stock_quantity',
+                    type: 'input',
+                    message: 'How many more items would you like to add to your inventory?'
                 }
-            );
-        });
+            ])
+            .then(function (answer) {
+                let updatedQuantity = res[0].stock_quantity + answer.stock_quantity;
+                connection.query(
+                    'UPDATE products SET ? WHERE ?',
+                    [
+                        { stock_quantity: updatedQuantity },
+                        { item_id: answer.item_id }
+                    ],
+                    function (err) {
+                        if (err) {
+                            console.log('Inventory update failed');
+                            throw err;
+                        } else {
+                            console.log(answer.stock_quantity + ' item(s) added to the ' + res[0].product_name + ' inventory');
+                            connection.end();
+                        }
+                    }
+                );
+            });
+    })
 }
 
 function addNewProduct() {

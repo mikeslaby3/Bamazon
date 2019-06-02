@@ -2,7 +2,7 @@
 
 Bamazon is a node.js application that utilizes mySQL and the node package "Inquirer" to create an Amazon-like storefront. There are two different modes, customer and manager. As a customer, the app takes in orders and then depletes stock from the store's inventory stored in a mySQL database. As a manager, the app allows you to add new product to the store as well as replenish inventory. 
 
-# Customer Mode
+## Customer Mode
 
 When a connection to the database is established, it presents the user with all of the items offered, accompanied by a product ID and price as shown below.
 
@@ -20,7 +20,7 @@ However, if the user inputs a non-existent item ID, requests a quantity higher t
 
 ![](images/out-of-stock.png)
 
-# Manager Mode
+## Manager Mode
 
 When a connection to the database is established, it presents the user with the five options shown below:
 
